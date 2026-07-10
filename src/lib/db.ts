@@ -29,6 +29,11 @@ export async function getPackages(): Promise<Package[]> {
 }
 
 export async function getPackageById(id: string): Promise<Package | null> {
+  if (!id) return null;
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    const { fallbackPackages } = await import("@/lib/fallback-data");
+    return fallbackPackages.find((p) => p.id === id) || null;
+  }
   try {
     const supabase = await getClient();
     const { data, error } = await supabase.from("packages").select("*").eq("id", id).single();

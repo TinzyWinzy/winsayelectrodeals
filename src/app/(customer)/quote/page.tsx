@@ -11,6 +11,7 @@ import { StepLocation } from "@/components/quote/step-location";
 import { StepPhoto } from "@/components/quote/step-photo";
 import { StepPaymentTerms } from "@/components/quote/step-payment-terms";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Card, CardContent } from "@/components/ui/card";
 import { useQuoteStore } from "@/store/quote-store";
@@ -35,12 +36,13 @@ function QuoteContent() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const pkgIdFromUrl = searchParams.get("package");
+
   useEffect(() => {
-    const pkgId = searchParams.get("package");
-    if (pkgId && !formData.packageId) {
-      updateFormData({ packageId: pkgId });
+    if (pkgIdFromUrl && !formData.packageId) {
+      updateFormData({ packageId: pkgIdFromUrl });
     }
-  }, [searchParams, formData.packageId, updateFormData]);
+  }, [pkgIdFromUrl, formData.packageId, updateFormData]);
 
   const handlePackageNext = useCallback(
     (pkg: Package) => {
@@ -180,7 +182,20 @@ function QuoteContent() {
         <Card className="border-0 shadow-lg bg-white">
           <CardContent className="p-6 sm:p-8">
             <AnimatePresence mode="wait">
-              {step === 1 && (
+              {step === 1 && !pkgIdFromUrl && (
+                <div className="text-center py-12 text-gray-500">
+                  <p>No package selected. Please browse our packages first.</p>
+                  <Button variant="outline" className="mt-4" onClick={() => router.push("/packages")}>
+                    View Packages
+                  </Button>
+                </div>
+              )}
+              {step === 1 && pkgIdFromUrl && !formData.packageId && (
+                <div className="flex justify-center py-12">
+                  <Spinner size="lg" />
+                </div>
+              )}
+              {step === 1 && pkgIdFromUrl && formData.packageId && (
                 <motion.div
                   key="step1"
                   initial={{ opacity: 0, x: 20 }}

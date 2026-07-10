@@ -124,7 +124,7 @@ export default function HomePage() {
               </Link>
               <Link
                 href="/packages"
-                className={buttonVariants({ variant: "outline", size: "lg", className: "border-white/30 text-white hover:bg-white/10 hover:border-white/50" })}
+                className={buttonVariants({ variant: "outline", size: "lg", className: "bg-white/0 border-white/30 text-white hover:bg-white/15 hover:border-white/50" })}
               >
                 View Packages
               </Link>
