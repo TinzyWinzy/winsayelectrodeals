@@ -3,7 +3,7 @@ import { createClient as createBrowserClient } from "@supabase/supabase-js";
 import type { Package, Customer, Quote, Payment, InstallSchedule, RbzRate } from "@/types";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
 function toCamelCase(row: Record<string, unknown>): Record<string, unknown> {
   const result: Record<string, unknown> = {};
@@ -13,13 +13,18 @@ function toCamelCase(row: Record<string, unknown>): Record<string, unknown> {
   return result;
 }
 
+function getSupabaseKey(): string {
+  return process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+}
+
 async function getClient() {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
+  const key = getSupabaseKey();
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !key) {
     return null;
   }
   try {
     if (typeof window === "undefined") {
-      return createBrowserClient(supabaseUrl, supabaseAnonKey);
+      return createBrowserClient(supabaseUrl, supabaseKey);
     }
     const { createClient } = await import("@/utils/supabase/client");
     return createClient();
@@ -181,7 +186,7 @@ export async function updatePackage(id: string, data: Record<string, unknown>): 
 }
 
 export function subscribeToQuotes(callback: (quotes: Quote[]) => void): () => void {
-  const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
+  const supabase = createBrowserClient(supabaseUrl, supabaseKey);
   const subscription = supabase
     .channel("quotes-channel")
     .on("postgres_changes" as any, { event: "*", schema: "public", table: "quotes" }, async () => {
@@ -208,7 +213,7 @@ export async function setRbzRate(usdToZig: number): Promise<void> {
 }
 
 export async function uploadMeterPhoto(file: File | Blob, quoteId: string): Promise<string> {
-  const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
+  const supabase = createBrowserClient(supabaseUrl, supabaseKey);
   const fileName = `meter-photos/${quoteId}/${Date.now()}.jpg`;
   const { data, error } = await supabase.storage.from("files").upload(fileName, file, { contentType: "image/jpeg" });
   if (error) throw error;
