@@ -51,6 +51,9 @@ export async function getCustomerByPhone(phone: string): Promise<Customer | null
 }
 
 export async function createCustomer(data: Omit<Customer, "id" | "createdAt">): Promise<string> {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return `local-cust-${Date.now()}`;
+  }
   const supabase = await getClient();
   const { data: result, error } = await supabase.from("customers").insert({
     name: data.name, phone: data.phone, email: data.email,
@@ -61,6 +64,10 @@ export async function createCustomer(data: Omit<Customer, "id" | "createdAt">): 
 }
 
 export async function createQuote(data: Omit<Quote, "id" | "createdAt"> & { quoteId: string }): Promise<string> {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    const { createLocalQuote } = await import("@/lib/fallback-data");
+    return createLocalQuote(data);
+  }
   const supabase = await getClient();
   const { data: result, error } = await supabase.from("quotes").insert({
     customer_id: data.customerId, package_id: data.packageId, roof_type: data.roofType,
@@ -74,6 +81,10 @@ export async function createQuote(data: Omit<Quote, "id" | "createdAt"> & { quot
 }
 
 export async function getQuoteByQuoteId(quoteId: string): Promise<Quote | null> {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    const { getLocalQuote } = await import("@/lib/fallback-data");
+    return getLocalQuote(quoteId);
+  }
   const supabase = await getClient();
   const { data, error } = await supabase.from("quotes").select("*").eq("quote_id", quoteId).maybeSingle();
   if (error) return null;

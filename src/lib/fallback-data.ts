@@ -1,4 +1,4 @@
-import type { Package } from "@/types";
+import type { Package, Quote } from "@/types";
 
 export const kvaToImage: Record<string, string> = {
   "3.2": "/3kvasystem.jpg",
@@ -179,3 +179,52 @@ export const fallbackPackages: Package[] = [
     ],
   },
 ];
+
+const QUOTES_STORAGE_KEY = "winsay_local_quotes";
+
+function getLocalQuotes(): Record<string, Quote> {
+  if (typeof window === "undefined") return {};
+  try {
+    return JSON.parse(localStorage.getItem(QUOTES_STORAGE_KEY) || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function saveLocalQuotes(quotes: Record<string, Quote>): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(QUOTES_STORAGE_KEY, JSON.stringify(quotes));
+  } catch {}
+}
+
+export function createLocalQuote(
+  data: Omit<Quote, "id" | "createdAt"> & { quoteId: string }
+): string {
+  const docId = `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  const quotes = getLocalQuotes();
+  quotes[data.quoteId] = {
+    id: docId,
+    customerId: data.customerId,
+    packageId: data.packageId,
+    roofType: data.roofType,
+    location: data.location,
+    meterPhotoUrl: data.meterPhotoUrl,
+    totalUsd: data.totalUsd,
+    totalZig: data.totalZig,
+    depositUsd: data.depositUsd,
+    depositZig: data.depositZig,
+    paymentMethod: data.paymentMethod,
+    status: data.status,
+    quoteId: data.quoteId,
+    payAfterInstall: data.payAfterInstall,
+    createdAt: new Date(),
+  };
+  saveLocalQuotes(quotes);
+  return docId;
+}
+
+export function getLocalQuote(quoteId: string): Quote | null {
+  const quotes = getLocalQuotes();
+  return quotes[quoteId] || null;
+}
