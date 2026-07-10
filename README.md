@@ -1,101 +1,43 @@
-# Winsay Electrodeals
+# Winsay Electrodeals — Solar Instant Quotes Zimbabwe
 
-Solar instant quote web application for Zimbabwean homes and businesses. Built with Next.js 15, Supabase, and PayNow Zimbabwe.
+Get a solar quote online in under 3 minutes. No site visit needed. Pay after installation available.
 
-## Features
+## About
 
-- **Instant Solar Quotes** — Get a quote in under 3 minutes with a 5-step form
-- **6 Solar Packages** — From 3.2Kva entry-level to 12Kva maximum power
-- **Flexible Payment** — Pay after installation available on qualifying tiers
-- **PayNow Integration** — Secure payments via EcoCash, InnBucks, Bank Transfer
-- **Admin Dashboard** — Manage leads, installation schedules, pricing, and RBZ rates
-- **PWA Ready** — Installable on mobile devices with offline caching
-- **Responsive Design** — Mobile-first layout with Tailwind CSS v4
+Winsay Electrodeals is a Zimbabwean-owned solar energy company based in Harare. We make solar power accessible to every home and business with honest pricing, professional installation, and flexible payment options.
 
-## Tech Stack
+**Visit our showroom:** Shop 23B, Copacabbana Mall, 1st Entrance, Cameroon Street, Harare  
+**Call us:** +263 785 293 587
 
-- **Framework:** Next.js 15 (App Router)
-- **UI:** React 19, Tailwind CSS 4, Framer Motion
-- **Backend:** Supabase (Auth, Database, Storage)
-- **Payments:** PayNow Zimbabwe
-- **Rate Limiting:** Upstash Redis
-- **Validation:** Zod 4
-- **State:** Zustand
+## Our Solar Packages
 
-## Getting Started
+| Package | Price (USD) | Panels | Battery | Best For |
+|---|---|---|---|---|
+| 3.2Kva System | $950 | 2 × 700W | 25.5V 150Ah Lithium | Entry-level backup |
+| 3.5Kva System | $1,000 | 3 × 700W | 24V 200Ah Lithium | Essential home backup |
+| 8.2Kva System | $1,900 | 8 × 700W | 48V 200Ah Lithium | Mid-range home system |
+| 10.2Kva Standard | $3,400 | 10 × 700W | 2 × 52.2V Promax | High-capacity home |
+| 10.2Kva WiFi | $2,500 | 10 × 700W | 52.2V 200Ah Lithium | Smart home with WiFi monitoring |
+| 12Kva System | $3,400 | 12 × 700W | 2 × 48V 200Ah | Maximum power |
 
-### Prerequisites
+All prices include full installation, protection kit, mounting kit, and voltage switch.
 
-- Node.js 20+
-- Supabase project (free tier works)
-- PayNow merchant account (Zimbabwe)
-- Upstash Redis instance (optional, for rate limiting)
+## Why Choose Us
 
-### Environment Variables
+- **500+ installations** across all 10 provinces
+- **Pay after installation** on qualifying tiers (deposit only, balance after install)
+- **Flexible payment** via EcoCash, InnBucks, PayNow, or bank transfer
+- **Brands we trust:** SUMRY, Deye, SRNE
+- **Professional installation** within 48 hours of deposit
+- **25-year warranties** on Tier-1 solar panels
+- **ZERA licensed** and fully insured
 
-Copy `.env.example` to `.env.local` and fill in the values:
+## Contact
 
-```bash
-cp .env.example .env.local
-```
+- **Phone:** +263 785 293 587
+- **Email:** info@winsay.co.zw
+- **Shop:** Shop 23B, Copacabbana Mall, 1st Entrance, Cameroon Street, Harare
 
-### Install & Run
+---
 
-```bash
-npm install
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-### Seed Database
-
-To load sample packages and RBZ rates into Supabase:
-
-```bash
-npx tsx scripts/seed-db.ts
-```
-
-## Project Structure
-
-```
-src/
-├── app/                    # Next.js App Router pages
-│   ├── (admin)/            # Admin dashboard (leads, schedule, settings)
-│   ├── (customer)/         # Customer pages (packages, quote, payment, confirmation)
-│   ├── api/                # API routes (quote, packages, payment, admin)
-│   └── login/              # Admin login
-├── components/
-│   ├── layout/             # Navbar, Footer
-│   ├── packages/           # Package card components
-│   ├── providers/          # Auth context provider
-│   ├── quote/              # Quote flow step components
-│   └── ui/                 # Reusable UI components (Button, Card, Table, etc.)
-├── lib/
-│   ├── admin-auth.ts       # Admin authorization helpers
-│   ├── auth.ts             # Supabase auth client & hooks
-│   ├── currency.ts         # RBZ exchange rate fetching
-│   ├── db.ts               # Supabase database operations
-│   ├── fallback-data.ts    # Fallback package data (works without Supabase)
-│   ├── offline.ts          # IndexedDB offline caching
-│   ├── payments.ts         # PayNow payment integration
-│   ├── pricing.ts          # Quote pricing engine (surcharges, discounts)
-│   └── rate-limiter.ts     # Upstash Redis rate limiting
-├── store/                  # Zustand stores
-├── types/                  # TypeScript types & Zod schemas
-└── utils/supabase/         # Supabase client (browser, server, middleware)
-```
-
-## Deployment
-
-Deploy to Vercel with zero configuration:
-
-```bash
-npm run build
-```
-
-Set environment variables in your hosting platform. The app runs as a standard Next.js application.
-
-## License
-
-Private — All rights reserved.
+Built with Next.js · Supabase · Tailwind CSS · Zimbabwe
