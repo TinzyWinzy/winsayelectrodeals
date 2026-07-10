@@ -3,7 +3,7 @@
 import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { ArrowLeft, Wallet, Building, Landmark, Smartphone, Shield } from "lucide-react";
+import { ArrowLeft, Wallet, Building, Landmark, Smartphone, Shield, MessageCircle, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Badge } from "@/components/ui/badge";
@@ -294,6 +294,22 @@ function PaymentContent() {
           <Button size="lg" className="w-full shadow-lg" onClick={handlePay} disabled={processing}>
             {processing ? "Processing..." : `Pay ${formatUsd(quote.depositUsd)} with ${paymentMethods.find(m => m.id === selectedMethod)?.label}`}
           </Button>
+
+          <div className="pt-2">
+            <button
+              onClick={() => {
+                const text = encodeURIComponent(
+                  `*Payment Initiated - Winsay Electrodeals*\n\nQuote: ${quote.quoteId}\nAmount: ${formatUsd(quote.depositUsd)}\nMethod: ${paymentMethods.find(m => m.id === selectedMethod)?.label}\n\nCustomer is ready to complete payment.`
+                );
+                window.open(`https://wa.me/263785293587?text=${text}`, "_blank");
+              }}
+              className="w-full flex items-center justify-center gap-2 p-3 rounded-xl border border-green-200 bg-green-50 text-green-700 text-sm font-medium hover:bg-green-100 transition-all"
+            >
+              <MessageCircle className="w-4 h-4" />
+              <Send className="w-3 h-3" />
+              Notify Winsay on WhatsApp
+            </button>
+          </div>
         </motion.div>
       </div>
     </div>

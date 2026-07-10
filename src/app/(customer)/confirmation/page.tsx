@@ -3,7 +3,7 @@
 import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { CheckCircle, Download, Calendar, Share2, Home, FileText } from "lucide-react";
+import { CheckCircle, Download, Calendar, Share2, Home, FileText, Send, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { getQuoteByQuoteId, getPackageById } from "@/lib/db";
 import { formatUsd } from "@/lib/utils";
 import type { Quote, Package } from "@/types";
+
+const BUSINESS_PHONE = "263785293587";
 
 function ConfirmationContent() {
   const router = useRouter();
@@ -63,9 +65,16 @@ function ConfirmationContent() {
     }
   };
 
+  const handleWhatsAppBusiness = () => {
+    const text = encodeURIComponent(
+      `*New Quote Request - Winsay Electrodeals*\n\nQuote ID: ${quoteId}\nPackage: ${pkg?.name || "-"}\nTotal: ${quote ? formatUsd(quote.totalUsd) : "-"}\nDeposit: ${quote ? formatUsd(quote.depositUsd) : "-"}\n\nCustomer can be reached via this link:\n${window.location.origin}/confirmation?quoteId=${quoteId}`
+    );
+    window.open(`https://wa.me/${BUSINESS_PHONE}?text=${text}`, "_blank");
+  };
+
   const handleWhatsAppShare = () => {
     const text = encodeURIComponent(
-      `Hello! I have generated a solar quote with Winsay Electrodeals.\n\nQuote ID: ${quoteId}\nAmount: ${quote ? formatUsd(quote.totalUsd) : ""}\nPackage: ${pkg?.name || ""}\n\nTrack your quote: ${window.location.origin}/confirmation?quoteId=${quoteId}`
+      `I have generated a solar quote with Winsay Electrodeals.\n\nQuote ID: ${quoteId}\nAmount: ${quote ? formatUsd(quote.totalUsd) : ""}\nPackage: ${pkg?.name || ""}\n\nTrack your quote: ${window.location.origin}/confirmation?quoteId=${quoteId}`
     );
     window.open(`https://wa.me/?text=${text}`, "_blank");
   };
@@ -133,6 +142,26 @@ function ConfirmationContent() {
             </CardContent>
           </Card>
 
+          <div className="bg-gradient-to-r from-green-600 to-green-500 rounded-xl p-5 shadow-lg">
+            <div className="flex items-center gap-3 mb-3">
+              <MessageCircle className="w-6 h-6 text-white" />
+              <p className="text-sm font-bold text-white text-left">
+                Notify Winsay on WhatsApp
+              </p>
+            </div>
+            <p className="text-xs text-white/80 mb-4 text-left">
+              Send your quote details to our team so we can fast-track your installation.
+            </p>
+            <Button
+              onClick={handleWhatsAppBusiness}
+              size="lg"
+              className="w-full bg-white text-green-700 hover:bg-green-50 font-bold shadow-md"
+            >
+              <Send className="w-5 h-5" />
+              Send Quote via WhatsApp
+            </Button>
+          </div>
+
           <div className="flex items-center justify-center gap-2 text-sm text-gray-500 bg-amber-50 rounded-lg p-3 border border-amber-100">
             <Calendar className="w-4 h-4 text-amber-500" />
             <span>Estimated installation within 48 hours of deposit payment</span>
@@ -145,7 +174,7 @@ function ConfirmationContent() {
             </Button>
             <Button onClick={handleWhatsAppShare} variant="outline" size="md">
               <Share2 className="w-4 h-4" />
-              Share via WhatsApp
+              Share with Friend
             </Button>
             {downloadError && (
               <p className="text-sm text-danger text-center">{downloadError}</p>
@@ -154,7 +183,7 @@ function ConfirmationContent() {
 
           <div className="pt-4">
             <p className="text-xs text-gray-400 mb-3">
-              For a faster experience, add this app to your home screen.
+              For a faster experience, call us directly on <a href="tel:+263785293587" className="font-semibold text-primary underline">+263 785 293 587</a>
             </p>
             <Button onClick={() => router.push("/")} variant="ghost" size="md">
               <Home className="w-4 h-4" />
