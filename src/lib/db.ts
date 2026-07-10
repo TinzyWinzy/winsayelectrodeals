@@ -68,53 +68,67 @@ export async function getCustomerByPhone(phone: string): Promise<Customer | null
 }
 
 export async function createCustomer(data: Omit<Customer, "id" | "createdAt">): Promise<string> {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !getSupabaseKey()) {
     return `local-cust-${Date.now()}`;
   }
-  const supabase = await getClient();
-  if (!supabase) return `local-cust-${Date.now()}`;
-  const { data: result, error } = await supabase.from("customers").insert({
-    name: data.name, phone: data.phone, email: data.email,
-    province: data.province, city: data.city, suburb: data.suburb,
-  }).select("id").single();
-  if (error) throw error;
-  return result.id;
+  try {
+    const supabase = await getClient();
+    if (!supabase) return `local-cust-${Date.now()}`;
+    const { data: result, error } = await supabase.from("customers").insert({
+      name: data.name, phone: data.phone, email: data.email,
+      province: data.province, city: data.city, suburb: data.suburb,
+    }).select("id").single();
+    if (error) throw error;
+    return result.id;
+  } catch {
+    return `local-cust-${Date.now()}`;
+  }
 }
 
 export async function createQuote(data: Omit<Quote, "id" | "createdAt"> & { quoteId: string }): Promise<string> {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !getSupabaseKey()) {
     const { createLocalQuote } = await import("@/lib/fallback-data");
     return createLocalQuote(data);
   }
-  const supabase = await getClient();
-  if (!supabase) {
+  try {
+    const supabase = await getClient();
+    if (!supabase) {
+      const { createLocalQuote } = await import("@/lib/fallback-data");
+      return createLocalQuote(data);
+    }
+    const { data: result, error } = await supabase.from("quotes").insert({
+      customer_id: data.customerId, package_id: data.packageId, roof_type: data.roofType,
+      location: data.location, meter_photo_url: data.meterPhotoUrl, total_usd: data.totalUsd,
+      total_zig: data.totalZig, deposit_usd: data.depositUsd, deposit_zig: data.depositZig,
+      payment_method: data.paymentMethod, status: data.status, quote_id: data.quoteId,
+      pay_after_install: data.payAfterInstall,
+    }).select("id").single();
+    if (error) throw error;
+    return result.id;
+  } catch {
     const { createLocalQuote } = await import("@/lib/fallback-data");
     return createLocalQuote(data);
   }
-  const { data: result, error } = await supabase.from("quotes").insert({
-    customer_id: data.customerId, package_id: data.packageId, roof_type: data.roofType,
-    location: data.location, meter_photo_url: data.meterPhotoUrl, total_usd: data.totalUsd,
-    total_zig: data.totalZig, deposit_usd: data.depositUsd, deposit_zig: data.depositZig,
-    payment_method: data.paymentMethod, status: data.status, quote_id: data.quoteId,
-    pay_after_install: data.payAfterInstall,
-  }).select("id").single();
-  if (error) throw error;
-  return result.id;
 }
 
 export async function getQuoteByQuoteId(quoteId: string): Promise<Quote | null> {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !getSupabaseKey()) {
     const { getLocalQuote } = await import("@/lib/fallback-data");
     return getLocalQuote(quoteId);
   }
-  const supabase = await getClient();
-  if (!supabase) {
+  try {
+    const supabase = await getClient();
+    if (!supabase) {
+      const { getLocalQuote } = await import("@/lib/fallback-data");
+      return getLocalQuote(quoteId);
+    }
+    const { data, error } = await supabase.from("quotes").select("*").eq("quote_id", quoteId).maybeSingle();
+    if (error) throw error;
+    return data ? (toCamelCase(data as any) as any) : null;
+  } catch {
     const { getLocalQuote } = await import("@/lib/fallback-data");
     return getLocalQuote(quoteId);
   }
-  const { data, error } = await supabase.from("quotes").select("*").eq("quote_id", quoteId).maybeSingle();
-  if (error) return null;
-  return data ? (toCamelCase(data as any) as any) : null;
 }
 
 export async function updateQuote(id: string, data: Record<string, unknown>): Promise<void> {
