@@ -140,12 +140,12 @@ async function seed() {
 
   const { error: rateError } = await supabase
     .from("rates")
-    .upsert({ id: 1, usd_to_zig: 400, updated_at: new Date().toISOString() });
+    .upsert({ id: 1, usd_to_zig: 26, updated_at: new Date().toISOString() });
 
   if (rateError) {
     console.error("Failed to set rate:", rateError.message);
   } else {
-    console.log("✓ Seeded RBZ rate (1 USD = 400 ZIG)");
+    console.log("✓ Seeded RBZ rate (1 USD = 26 ZIG)");
   }
 
   console.log("Seed complete!");

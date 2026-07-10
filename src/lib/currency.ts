@@ -24,7 +24,7 @@ export async function getUsdToZigRate(): Promise<number> {
       return cached.usdToZig;
     }
     const fallback = process.env.NEXT_PUBLIC_FALLBACK_ZIG_RATE;
-    return fallback ? parseFloat(fallback) : 400;
+    return fallback ? parseFloat(fallback) : 26;
   }
 }
 
