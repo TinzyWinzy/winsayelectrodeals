@@ -41,3 +41,33 @@ All prices include full installation, protection kit, mounting kit, and voltage 
 ---
 
 Built with Next.js · Supabase · Tailwind CSS · Zimbabwe
+
+## Deployment
+
+This app is built for GitHub Actions CI/CD into Vercel, with Supabase as the database and auth backend.
+
+### GitHub repository secrets
+
+Add these secrets in GitHub before enabling the workflow:
+
+- `VERCEL_TOKEN`
+- `VERCEL_ORG_ID`
+- `VERCEL_PROJECT_ID`
+
+The workflow in `.github/workflows/vercel.yml` validates every pull request with `npm run lint` and `npm run build`, deploys pull requests as Vercel previews, and deploys pushes to `main` to production.
+
+### Vercel environment variables
+
+Configure these in Vercel Project Settings for Preview and Production:
+
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`
+- `ADMIN_EMAILS`
+- `SUPABASE_SERVICE_KEY`
+- `PAYNOW_INTEGRATION_ID`
+- `PAYNOW_INTEGRATION_KEY`
+- `PAYNOW_RESULT_URL`
+- `PAYNOW_RETURN_URL`
+- `UPSTASH_REDIS_URL`
+- `UPSTASH_REDIS_TOKEN`
+- `NEXT_PUBLIC_FALLBACK_ZIG_RATE`

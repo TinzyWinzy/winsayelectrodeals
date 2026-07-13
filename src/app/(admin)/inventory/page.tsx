@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { SkeletonTable } from "@/components/ui/skeleton";
-import type { Product, InventoryStock, StockMovement, PurchaseOrder, ProductCategory } from "@/types/inventory";
+import type { Product, InventoryStock, StockMovement, PurchaseOrder, ProductCategory, PoStatus } from "@/types/inventory";
 import { productCategoryLabels, unitLabels, movementTypeLabels, poStatusLabels, poStatusColors } from "@/types/inventory";
 
 type InvTab = "products" | "stock" | "purchase-orders";
@@ -255,31 +255,174 @@ function StockSection() {
 
 function PurchaseOrdersSection() {
   const [orders, setOrders] = useState<PurchaseOrder[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ supplier: "", poNumber: "", expectedDate: "", notes: "" });
+  const [items, setItems] = useState([{ productId: "", quantity: "1", unitPriceUsd: "" }]);
 
-  useEffect(() => { fetch("/api/inventory?type=purchase-orders").then(r => r.json()).then(setOrders).finally(() => setLoading(false)); }, []);
+  const loadOrders = async () => {
+    const data = await fetch("/api/inventory?type=purchase-orders").then(r => r.json());
+    setOrders(data);
+  };
+
+  useEffect(() => {
+    Promise.all([
+      fetch("/api/inventory?type=purchase-orders").then(r => r.json()),
+      fetch("/api/inventory?type=products").then(r => r.json()),
+    ])
+      .then(([orderData, productData]) => {
+        setOrders(orderData);
+        setProducts(productData);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const resetForm = () => {
+    setForm({ supplier: "", poNumber: "", expectedDate: "", notes: "" });
+    setItems([{ productId: "", quantity: "1", unitPriceUsd: "" }]);
+    setShowForm(false);
+  };
+
+  const handleCreate = async () => {
+    if (!form.supplier.trim()) return;
+    const validItems = items
+      .map(item => ({
+        productId: item.productId,
+        quantity: parseInt(item.quantity, 10),
+        unitPriceUsd: item.unitPriceUsd ? parseFloat(item.unitPriceUsd) : undefined,
+      }))
+      .filter(item => item.productId && item.quantity > 0);
+
+    setSaving(true);
+    try {
+      const response = await fetch("/api/inventory?type=purchase-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          supplier: form.supplier.trim(),
+          poNumber: form.poNumber.trim() || undefined,
+          notes: form.notes.trim() || undefined,
+        }),
+      });
+      const { id } = await response.json();
+      if (!response.ok || !id) throw new Error("Could not create purchase order");
+
+      await Promise.all(validItems.map(item => fetch("/api/inventory?type=po-item", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...item, purchaseOrderId: id }),
+      })));
+
+      const totalAmountUsd = validItems.reduce((sum, item) => sum + item.quantity * (item.unitPriceUsd || 0), 0);
+      await fetch(`/api/inventory?type=purchase-order&id=${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          expectedDate: form.expectedDate || null,
+          totalAmountUsd: totalAmountUsd || null,
+          status: "pending",
+        }),
+      });
+
+      await loadOrders();
+      resetForm();
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleStatusChange = async (id: string, status: PoStatus) => {
+    await fetch(`/api/inventory?type=purchase-order&id=${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+    setOrders(prev => prev.map(order => order.id === id ? { ...order, status } : order));
+  };
 
   if (loading) return <SkeletonTable rows={5} />;
+
+  const estimatedTotal = items.reduce((sum, item) => {
+    const quantity = parseInt(item.quantity, 10) || 0;
+    const unitPrice = parseFloat(item.unitPriceUsd) || 0;
+    return sum + quantity * unitPrice;
+  }, 0);
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Purchase Orders</CardTitle>
-        <Button size="sm" onClick={() => alert("Full PO creation form coming in next update")}>
+        <Button size="sm" onClick={() => setShowForm(true)}>
           <Plus className="w-4 h-4" /> New PO
         </Button>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
+        {showForm && (
+          <div className="border border-primary/20 rounded-lg p-4 space-y-4 bg-primary/5">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+              <Input placeholder="Supplier" value={form.supplier} onChange={e => setForm(p => ({ ...p, supplier: e.target.value }))} />
+              <Input placeholder="PO number (auto if blank)" value={form.poNumber} onChange={e => setForm(p => ({ ...p, poNumber: e.target.value }))} />
+              <Input type="date" value={form.expectedDate} onChange={e => setForm(p => ({ ...p, expectedDate: e.target.value }))} />
+              <Input placeholder="Notes" value={form.notes} onChange={e => setForm(p => ({ ...p, notes: e.target.value }))} />
+            </div>
+
+            <div className="space-y-2">
+              {items.map((item, index) => (
+                <div key={index} className="grid grid-cols-1 md:grid-cols-[1fr_110px_140px_auto] gap-2">
+                  <select
+                    value={item.productId}
+                    onChange={e => setItems(prev => prev.map((line, i) => i === index ? { ...line, productId: e.target.value } : line))}
+                    className="h-12 px-3 rounded-lg border border-gray-300 bg-white text-sm"
+                  >
+                    <option value="">Select product</option>
+                    {products.map(product => (
+                      <option key={product.id} value={product.id}>
+                        {product.name}{product.sku ? ` (${product.sku})` : ""}
+                      </option>
+                    ))}
+                  </select>
+                  <Input type="number" min={1} placeholder="Qty" value={item.quantity} onChange={e => setItems(prev => prev.map((line, i) => i === index ? { ...line, quantity: e.target.value } : line))} />
+                  <Input type="number" min={0} step="0.01" placeholder="Unit USD" value={item.unitPriceUsd} onChange={e => setItems(prev => prev.map((line, i) => i === index ? { ...line, unitPriceUsd: e.target.value } : line))} />
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setItems(prev => prev.length === 1 ? prev : prev.filter((_, i) => i !== index))}
+                    disabled={items.length === 1}
+                  >
+                    Remove
+                  </Button>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <Button type="button" size="sm" variant="outline" onClick={() => setItems(prev => [...prev, { productId: "", quantity: "1", unitPriceUsd: "" }])}>
+                <Plus className="w-4 h-4" /> Add Item
+              </Button>
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-medium text-gray-600">Estimated total: ${estimatedTotal.toFixed(2)}</span>
+                <Button size="sm" onClick={handleCreate} disabled={saving || !form.supplier.trim()}>
+                  <Save className="w-4 h-4" /> {saving ? "Saving..." : "Create PO"}
+                </Button>
+                <Button size="sm" variant="ghost" onClick={resetForm} disabled={saving}>Cancel</Button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {orders.length === 0 ? (
           <p className="text-center text-gray-400 py-8">No purchase orders yet</p>
         ) : (
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
-                <TableRow>
-                  <TableHead>PO #</TableHead>
-                  <TableHead>Supplier</TableHead>
-                  <TableHead>Status</TableHead>
+                  <TableRow>
+                    <TableHead>PO #</TableHead>
+                    <TableHead>Supplier</TableHead>
+                    <TableHead>Status</TableHead>
                   <TableHead>Total (USD)</TableHead>
                   <TableHead>Ordered</TableHead>
                   <TableHead>Expected</TableHead>
@@ -290,7 +433,21 @@ function PurchaseOrdersSection() {
                   <TableRow key={po.id}>
                     <TableCell className="font-mono text-sm font-medium">{po.poNumber}</TableCell>
                     <TableCell>{po.supplier}</TableCell>
-                    <TableCell><Badge variant={poStatusColors[po.status]}>{poStatusLabels[po.status]}</Badge></TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={poStatusColors[po.status]}>{poStatusLabels[po.status]}</Badge>
+                        <select
+                          value={po.status}
+                          onChange={e => handleStatusChange(po.id, e.target.value as PoStatus)}
+                          className="h-8 px-2 rounded-lg border border-gray-300 bg-white text-xs"
+                          aria-label={`Update status for ${po.poNumber}`}
+                        >
+                          {Object.entries(poStatusLabels).map(([value, label]) => (
+                            <option key={value} value={value}>{label}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </TableCell>
                     <TableCell className="tabular-nums">${(po.totalAmountUsd || 0).toFixed(2)}</TableCell>
                     <TableCell className="text-sm text-gray-500">{new Date(po.orderDate).toLocaleDateString()}</TableCell>
                     <TableCell className="text-sm text-gray-500">{po.expectedDate ? new Date(po.expectedDate).toLocaleDateString() : "-"}</TableCell>

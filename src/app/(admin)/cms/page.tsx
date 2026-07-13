@@ -1,5 +1,6 @@
 "use client";
 
+import NextImage from "next/image";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Plus, Trash2, Image, Star, FileText, Layout, Settings2 } from "lucide-react";
@@ -110,7 +111,15 @@ function HeroSection() {
         {slides.map(slide => (
           <div key={slide.id} className="flex items-center justify-between border rounded-lg p-4">
             <div className="flex items-center gap-4">
-              {slide.imageUrl && <img src={slide.imageUrl} alt="" className="w-16 h-12 rounded object-cover" />}
+              {slide.imageUrl && (
+                <NextImage
+                  src={slide.imageUrl}
+                  alt=""
+                  width={64}
+                  height={48}
+                  className="w-16 h-12 rounded object-cover"
+                />
+              )}
               <div>
                 <p className="font-medium">{slide.title}</p>
                 <p className="text-sm text-gray-500">{slide.subtitle}</p>
@@ -307,7 +316,15 @@ function BrandsSection() {
         {items.map(item => (
           <div key={item.id} className="flex items-center justify-between border rounded-lg p-4">
             <div className="flex items-center gap-4">
-              {item.logoUrl && <img src={item.logoUrl} alt={item.name} className="w-12 h-12 rounded object-contain bg-gray-50" />}
+              {item.logoUrl && (
+                <NextImage
+                  src={item.logoUrl}
+                  alt={item.name}
+                  width={48}
+                  height={48}
+                  className="w-12 h-12 rounded object-contain bg-gray-50"
+                />
+              )}
               <div>
                 <p className="font-medium">{item.name}</p>
                 <span className="text-xs text-gray-400">Order: {item.sortOrder}</span>
