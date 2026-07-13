@@ -5,8 +5,12 @@ import {
   getPurchaseOrders, getPurchaseOrderById, createPurchaseOrder, updatePurchaseOrder, addPurchaseOrderItem, receivePurchaseOrderItem,
   getInventoryStats,
 } from "@/lib/inventory-db";
+import { getAdminUser, unauthorizedResponse } from "@/lib/admin-auth";
 
 export async function GET(request: Request) {
+  const admin = await getAdminUser("MANAGER");
+  if (!admin) return unauthorizedResponse();
+
   const url = new URL(request.url);
   const type = url.searchParams.get("type") || "products";
   const id = url.searchParams.get("id");
@@ -31,6 +35,9 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const admin = await getAdminUser("MANAGER");
+  if (!admin) return unauthorizedResponse();
+
   const url = new URL(request.url);
   const type = url.searchParams.get("type") || "product";
   const body = await request.json();
@@ -52,6 +59,9 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
+  const admin = await getAdminUser("MANAGER");
+  if (!admin) return unauthorizedResponse();
+
   const url = new URL(request.url);
   const type = url.searchParams.get("type") || "product";
   const id = url.searchParams.get("id");

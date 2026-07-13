@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { getAllCustomers, getCustomerById, getCustomerNotes, createCustomerNote, getCommunicationLogs, createCommunicationLog } from "@/lib/crm-db";
+import { getAdminUser, unauthorizedResponse } from "@/lib/admin-auth";
 
 export async function GET(request: Request) {
+  const admin = await getAdminUser("SALES_AGENT");
+  if (!admin) return unauthorizedResponse();
+
   const url = new URL(request.url);
   const type = url.searchParams.get("type") || "customers";
   const customerId = url.searchParams.get("customerId");
@@ -22,6 +26,9 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const admin = await getAdminUser("SALES_AGENT");
+  if (!admin) return unauthorizedResponse();
+
   const url = new URL(request.url);
   const type = url.searchParams.get("type") || "note";
   const body = await request.json();

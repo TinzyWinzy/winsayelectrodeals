@@ -1,5 +1,6 @@
 interface SolarFinderLeadRow {
   id: string;
+  lead_id: string | null;
   timestamp: string;
   full_name: string;
   whatsapp_number: string;
@@ -21,6 +22,69 @@ interface SolarFinderLeadRow {
   expert_review_required: boolean;
   lead_source: string;
   status: string;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  utm_content: string | null;
+  referrer: string | null;
+  landing_page: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface TeamMemberRow {
+  id: string;
+  user_id: string;
+  email: string;
+  full_name: string | null;
+  role: "SUPER_ADMIN" | "MANAGER" | "SALES_AGENT" | "MARKETING" | "TECHNICIAN" | "VIEWER";
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+interface LeadRow {
+  id: string;
+  customer_id: string | null;
+  full_name: string;
+  phone: string | null;
+  whatsapp_number: string | null;
+  email: string | null;
+  city: string | null;
+  suburb: string | null;
+  source: string;
+  campaign: string | null;
+  referrer: string | null;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  utm_content: string | null;
+  landing_page: string | null;
+  selected_appliances: unknown[];
+  property_type: string | null;
+  backup_duration: string | null;
+  usage_pattern: string | null;
+  budget: string | null;
+  recommended_package_id: string | null;
+  recommended_package_name: string | null;
+  alternative_package_id: string | null;
+  alternative_package_name: string | null;
+  estimated_continuous_load: number;
+  estimated_surge_load: number;
+  confidence_score: number | null;
+  expert_review_required: boolean;
+  assigned_to: string | null;
+  pipeline_status: string;
+  lead_score: number;
+  lead_temperature: "hot" | "warm" | "cold";
+  installation_urgency: string | null;
+  last_contact_date: string | null;
+  next_follow_up_date: string | null;
+  lost_reason: string | null;
+  notes: string | null;
+  duplicate_of: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Database {
@@ -112,11 +176,21 @@ export interface Database {
         Insert: Omit<Database["public"]["Tables"]["install_schedules"]["Row"], "id" | "created_at">;
         Update: Partial<Database["public"]["Tables"]["install_schedules"]["Insert"]>;
       };
-    };
-    solar_finder_leads: {
-      Row: SolarFinderLeadRow;
-      Insert: Omit<SolarFinderLeadRow, "id" | "timestamp">;
-      Update: Partial<Omit<SolarFinderLeadRow, "id" | "timestamp">>;
+      team_members: {
+        Row: TeamMemberRow;
+        Insert: Omit<TeamMemberRow, "id" | "created_at" | "updated_at">;
+        Update: Partial<Omit<TeamMemberRow, "id" | "created_at" | "updated_at">>;
+      };
+      leads: {
+        Row: LeadRow;
+        Insert: Partial<Omit<LeadRow, "id" | "created_at" | "updated_at">> & Pick<LeadRow, "full_name">;
+        Update: Partial<Omit<LeadRow, "id" | "created_at" | "updated_at">>;
+      };
+      solar_finder_leads: {
+        Row: SolarFinderLeadRow;
+        Insert: Partial<Omit<SolarFinderLeadRow, "created_at" | "updated_at">> & Pick<SolarFinderLeadRow, "id" | "full_name" | "whatsapp_number" | "recommended_package_id" | "recommended_package_name">;
+        Update: Partial<Omit<SolarFinderLeadRow, "id" | "created_at" | "updated_at">>;
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

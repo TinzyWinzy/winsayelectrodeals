@@ -29,16 +29,16 @@ export function Navbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-white/95 backdrop-blur-xl shadow-lg border-b border-gray-100/50"
+          ? "bg-white/92 backdrop-blur-xl shadow-[0_18px_45px_rgb(7_9_26/0.08)] border-b border-gray-200/70"
           : "bg-transparent"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-18 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 group">
-          <div className={`w-9 h-9 rounded-xl overflow-hidden flex items-center justify-center transition-all duration-300 shadow-sm ${
+          <div className={`w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center transition-all duration-300 shadow-sm ${
             scrolled
-              ? "ring-1 ring-gray-200"
-              : "bg-white/15 backdrop-blur-sm"
+              ? "ring-1 ring-gold/30"
+              : "bg-white/15 backdrop-blur-sm ring-1 ring-white/20"
           }`}>
             <Image
               src="/logo.jpg"
@@ -55,7 +55,7 @@ export function Navbar() {
               Winsay
             </span>
             <span className={`text-[10px] font-medium block leading-none -mt-0.5 transition-colors duration-300 ${
-              scrolled ? "text-gray-400" : "text-white/60"
+              scrolled ? "text-gold" : "text-gold-light"
             }`}>
               Electrodeals
             </span>
@@ -76,13 +76,13 @@ export function Navbar() {
               {link.label}
             </Link>
           ))}
-          <Link href="tel:+263785293587" className="hidden lg:flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white/70 hover:text-white transition-colors">
+          <Link href="tel:+263785293587" className={`hidden lg:flex items-center gap-1.5 px-3 py-2 text-sm font-semibold transition-colors ${scrolled ? "text-primary hover:text-secondary" : "text-white/80 hover:text-white"}`}>
             <Phone className="w-3.5 h-3.5" />
             +263 785 293 587
           </Link>
           <div className="w-px h-6 bg-gray-200/20 mx-1 hidden lg:block" />
           <Link href="/packages">
-            <Button variant={scrolled ? "primary" : "secondary"} size="sm" className="transition-all duration-300">
+            <Button variant={scrolled ? "premium" : "secondary"} size="sm" className="transition-all duration-300">
               Get Free Quote
               <ArrowRight className="w-3.5 h-3.5" />
             </Button>

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Zap, Shield, Sun, Clock, Sparkles, Star, CheckCircle, Users, Award, MapPin, Phone, Search } from "lucide-react";
+import { ArrowRight, Zap, Shield, Sun, Clock, Sparkles, Star, CheckCircle, Users, Award, MapPin, Phone, Search, BadgeDollarSign } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -73,7 +73,7 @@ export default function HomePage() {
     <div className="flex flex-col min-h-screen">
 
       {/* ───── HERO ───── */}
-      <section className="relative min-h-[90vh] flex items-center overflow-hidden">
+      <section className="relative min-h-[92vh] flex items-center overflow-hidden bg-ink">
         <div className="absolute inset-0">
           <Image
             src="/8kva10.2kvasystem.jpg"
@@ -82,51 +82,50 @@ export default function HomePage() {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/85 to-primary/70" />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgb(7_9_26/0.96),rgb(5_4_95/0.84)_48%,rgb(192_0_18/0.44))]" />
+          <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-white to-transparent" />
         </div>
 
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 sm:py-32">
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-28 sm:py-36">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="max-w-3xl"
+            className="max-w-4xl"
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1, duration: 0.4 }}
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/10 text-sm font-medium mb-6"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-white/10 backdrop-blur-sm border border-gold/30 text-sm font-semibold text-white mb-6 shadow-lg"
             >
               <Sparkles className="w-4 h-4" />
-              Zimbabwe&apos;s Trusted Solar Installer
+              Premium solar systems from $950 to $3,400
             </motion.div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight mb-6 tracking-tight text-white">
-              Solar Power for
-              <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-300 to-yellow-200">
-                Every Home
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold leading-[0.98] mb-6 tracking-tight text-white text-balance">
+              Winsay Electrodeals
+              <span className="block text-gold-light">
+                installed solar packages.
               </span>
             </h1>
-            <p className="text-lg sm:text-xl text-white/80 mb-8 leading-relaxed max-w-xl">
-              Get an instant solar quote in under 3 minutes. No site visit needed.
-              Pay after installation options available. Trusted by over 500 Zimbabwean
-              homes and businesses.
+            <p className="text-lg sm:text-xl text-white/82 mb-8 leading-relaxed max-w-2xl">
+              Compare complete home and business systems, get guided package sizing,
+              and send a structured enquiry to the Winsay sales team in under 3 minutes.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
-                href="/packages"
+                href="/solar-finder"
                 className={buttonVariants({ variant: "secondary", size: "lg", className: "shadow-lg hover:shadow-xl transition-shadow" })}
               >
-                Get Instant Quote
+                Find My System
                 <Zap className="w-5 h-5" />
               </Link>
               <Link
                 href="/packages"
-                className={buttonVariants({ variant: "outline", size: "lg", className: "bg-white/0 border-white/30 text-white hover:bg-white/15 hover:border-white/50" })}
+                className={buttonVariants({ variant: "outline", size: "lg", className: "bg-white/8 border-gold/40 text-white hover:bg-white/15 hover:border-gold-light" })}
               >
-                View Packages
+                View Installed Packages
               </Link>
             </div>
 
@@ -134,21 +133,22 @@ export default function HomePage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
-              className="flex items-center gap-6 mt-10 pt-8 border-t border-white/10"
+              className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-10 pt-8 border-t border-white/12 max-w-3xl"
             >
-              <div className="flex -space-x-2">
-                {[1, 2, 3, 4].map((i) => (
-                  <div
-                    key={i}
-                    className="w-8 h-8 rounded-full bg-white/20 border-2 border-white/30 flex items-center justify-center text-[10px] font-bold text-white"
-                  >
-                    {i}
+              {[
+                { icon: Users, label: "500+ installations", value: "Across Zimbabwe" },
+                { icon: Shield, label: "Complete kits", value: "Protection, mounting, install" },
+                { icon: BadgeDollarSign, label: "Flexible terms", value: "Pay-after-install options" },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div key={item.label} className="rounded-lg border border-white/12 bg-white/8 backdrop-blur-sm p-4">
+                    <Icon className="w-5 h-5 text-gold-light mb-3" />
+                    <p className="text-sm font-bold text-white">{item.label}</p>
+                    <p className="text-xs text-white/62 mt-1">{item.value}</p>
                   </div>
-                ))}
-              </div>
-              <p className="text-sm text-white/60">
-                <span className="text-white font-semibold">500+</span> homes powered
-              </p>
+                );
+              })}
             </motion.div>
           </motion.div>
         </div>

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ChevronRight, Check, Wifi, Star } from "lucide-react";
+import { ChevronRight, Check, Wifi, Star, ShieldCheck, Wrench } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,39 +31,44 @@ export function PackageCard({ pkg, index }: PackageCardProps) {
       transition={{ delay: index * 0.08, duration: 0.4 }}
     >
       <Card
-        className={`relative h-full flex flex-col overflow-hidden transition-all duration-300 group hover:shadow-xl hover:-translate-y-1 ${
-          isPopular ? "border-secondary/30 ring-1 ring-secondary/10" : ""
+        className={`relative h-full flex flex-col overflow-hidden transition-all duration-300 group hover:-translate-y-1 premium-shadow ${
+          isPopular ? "border-gold/50 ring-1 ring-gold/25" : "border-gray-200"
         }`}
       >
         {isPopular && (
           <div className="absolute top-0 right-0 z-10">
-            <div className="bg-gradient-to-l from-secondary to-red-600 text-white text-[10px] font-bold px-3 py-1 rounded-bl-lg shadow-sm flex items-center gap-1">
+            <div className="bg-ink text-gold-light text-[10px] font-bold px-3 py-1 rounded-bl-lg shadow-sm flex items-center gap-1 border-l border-b border-gold/30">
               <Star className="w-3 h-3" />
               Most Popular
             </div>
           </div>
         )}
 
-        <div className="relative h-36 bg-gray-100 overflow-hidden">
+        <div className="relative h-44 bg-gray-100 overflow-hidden">
           <Image
             src={getPackageImage(pkg.kvaRating)}
             alt={`${pkg.kvaRating}Kva solar system`}
             fill
             className="object-cover transition-transform duration-500 group-hover:scale-110"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-          <div className="absolute bottom-2 left-3">
-            <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/90 backdrop-blur-sm text-[10px] font-bold text-primary">
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/70 via-ink/10 to-transparent" />
+          <div className="absolute bottom-3 left-3 flex items-center gap-2">
+            <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-white/92 backdrop-blur-sm text-[11px] font-bold text-primary shadow-sm">
               {pkg.kvaRating}Kva
             </div>
+            {pkg.payAfterInstallEligible && (
+              <div className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-gold-light text-ink text-[11px] font-bold shadow-sm">
+                Pay after install
+              </div>
+            )}
           </div>
         </div>
 
-        <CardContent className="p-4 flex flex-col flex-1">
+        <CardContent className="p-5 flex flex-col flex-1">
           <div className="flex items-start justify-between mb-2">
-            <h3 className="text-base font-bold text-primary">{pkg.name}</h3>
+            <h3 className="text-lg font-bold text-primary leading-tight">{pkg.name}</h3>
             {pkg.badge && (
-              <Badge variant="secondary" className="text-[10px] whitespace-nowrap ml-2">
+              <Badge variant="secondary" className="text-[10px] whitespace-nowrap ml-2 bg-secondary text-white border-0">
                 {pkg.badge}
               </Badge>
             )}
@@ -75,8 +80,19 @@ export function PackageCard({ pkg, index }: PackageCardProps) {
             </p>
           )}
 
-          <div className="space-y-1.5 mb-4">
-            {displaySpecs.map((spec, i) => (
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            <div className="rounded-lg bg-surface px-3 py-2">
+              <p className="text-[10px] uppercase font-bold text-gray-400">Panels</p>
+              <p className="text-sm font-bold text-primary">{pkg.panelCount} x 700W</p>
+            </div>
+            <div className="rounded-lg bg-surface px-3 py-2">
+              <p className="text-[10px] uppercase font-bold text-gray-400">Battery</p>
+              <p className="text-sm font-bold text-primary truncate">{pkg.batterySpec}</p>
+            </div>
+          </div>
+
+          <div className="space-y-1.5 mb-5">
+            {displaySpecs.slice(0, 5).map((spec, i) => (
               <div key={i} className="flex items-start gap-2 text-sm text-gray-600">
                 <Check className={`w-4 h-4 mt-0.5 shrink-0 ${spec.toLowerCase().includes("free install") ? "text-success" : "text-primary"}`} />
                 <span>{spec}</span>
@@ -85,9 +101,10 @@ export function PackageCard({ pkg, index }: PackageCardProps) {
           </div>
 
           <div className="mt-auto space-y-3">
-            <div className="bg-secondary rounded-lg p-3 text-center shadow-sm">
+            <div className="bg-ink rounded-lg p-4 text-center shadow-sm border border-gold/30">
+              <p className="text-[10px] uppercase tracking-wider font-bold text-gold-light mb-1">Installed from</p>
               <div className="flex items-baseline justify-center gap-1.5">
-                <span className="text-2xl font-bold text-white tabular-nums">
+                <span className="text-3xl font-bold text-white tabular-nums">
                   {formatUsd(pkg.basePriceUsd)}
                 </span>
                 <span className="text-xs text-white/70 font-medium">USD</span>
@@ -103,10 +120,14 @@ export function PackageCard({ pkg, index }: PackageCardProps) {
             <div className="flex flex-wrap gap-1">
               {pkg.freeGift && (
                 <Badge variant="success" className="flex items-center gap-1 text-[10px]">
-                  <Check className="w-3 h-3" />
+                  <Wrench className="w-3 h-3" />
                   {pkg.freeGift}
                 </Badge>
               )}
+              <Badge variant="outline" className="flex items-center gap-1 text-[10px]">
+                <ShieldCheck className="w-3 h-3" />
+                Protected kit
+              </Badge>
               {pkg.wifiEnabled && (
                 <Badge variant="primary" className="flex items-center gap-1 text-[10px]">
                   <Wifi className="w-3 h-3" />
@@ -116,7 +137,7 @@ export function PackageCard({ pkg, index }: PackageCardProps) {
             </div>
 
             <Link href={`/quote?package=${pkg.id}`} className="block">
-              <Button variant="primary" size="sm" className="w-full group/btn">
+              <Button variant="premium" size="sm" className="w-full group/btn">
                 Get Free Quote
                 <ChevronRight className="w-4 h-4 transition-transform duration-200 group-hover/btn:translate-x-0.5" />
               </Button>

@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { getHeroSlides, createHeroSlide, updateHeroSlide, deleteHeroSlide, getTestimonials, createTestimonial, updateTestimonial, deleteTestimonial, getSiteContent, updateSiteContent, getBrands, createBrand, updateBrand, deleteBrand, getSiteSettings, updateSiteSetting } from "@/lib/cms-db";
+import { getAdminUser, unauthorizedResponse } from "@/lib/admin-auth";
 
 export async function GET(request: Request) {
+  const admin = await getAdminUser("MARKETING");
+  if (!admin) return unauthorizedResponse();
+
   const url = new URL(request.url);
   const type = url.searchParams.get("type") || "hero";
 
@@ -22,6 +26,9 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const admin = await getAdminUser("MARKETING");
+  if (!admin) return unauthorizedResponse();
+
   const url = new URL(request.url);
   const type = url.searchParams.get("type") || "hero";
   const body = await request.json();
@@ -41,6 +48,9 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
+  const admin = await getAdminUser("MARKETING");
+  if (!admin) return unauthorizedResponse();
+
   const url = new URL(request.url);
   const type = url.searchParams.get("type") || "hero";
   const id = url.searchParams.get("id");
@@ -63,6 +73,9 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  const admin = await getAdminUser("MANAGER");
+  if (!admin) return unauthorizedResponse();
+
   const url = new URL(request.url);
   const type = url.searchParams.get("type") || "hero";
   const id = url.searchParams.get("id");

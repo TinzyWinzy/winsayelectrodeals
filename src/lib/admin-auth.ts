@@ -1,5 +1,11 @@
 import { createClient } from "@/utils/supabase/server";
 import { NextResponse } from "next/server";
+import { isUserRole, roleAtLeast, type UserRole } from "@/lib/rbac";
+
+type TeamMemberAccessRow = {
+  role: string | null;
+  active: boolean | null;
+};
 
 function getAdminEmails(): string[] {
   const env = process.env.ADMIN_EMAILS || "";
@@ -9,7 +15,7 @@ function getAdminEmails(): string[] {
     .filter(Boolean);
 }
 
-export async function getAdminUser() {
+export async function getAdminUser(minimumRole: UserRole = "VIEWER") {
   const supabase = await createClient();
   const {
     data: { user },
@@ -18,12 +24,25 @@ export async function getAdminUser() {
 
   if (error || !user?.email) return null;
 
-  const adminEmails = getAdminEmails();
-  if (adminEmails.length === 0) return null;
+  try {
+    const { data } = await supabase
+      .from("team_members")
+      .select("role, active")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    const member = data as TeamMemberAccessRow | null;
 
+    if (member?.active && isUserRole(member.role) && roleAtLeast(member.role, minimumRole)) {
+      return { ...user, role: member.role };
+    }
+  } catch {
+    // If the migration has not been applied yet, fall back to ADMIN_EMAILS.
+  }
+
+  const adminEmails = getAdminEmails();
   if (!adminEmails.includes(user.email.toLowerCase())) return null;
 
-  return user;
+  return { ...user, role: "SUPER_ADMIN" as UserRole };
 }
 
 export function unauthorizedResponse(message = "Unauthorized") {
