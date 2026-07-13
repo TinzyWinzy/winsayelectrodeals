@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Zap, Shield, Sun, Clock, Sparkles, Star, CheckCircle, Users, Award, MapPin, Phone } from "lucide-react";
+import { ArrowRight, Zap, Shield, Sun, Clock, Sparkles, Star, CheckCircle, Users, Award, MapPin, Phone, Search } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -426,6 +426,37 @@ export default function HomePage() {
               </div>
             </motion.div>
           </div>
+        </div>
+      </section>
+
+      {/* ───── FIND MY SOLAR SYSTEM ───── */}
+      <section className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary-light p-8 sm:p-12 shadow-xl"
+          >
+            <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-secondary/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+            <div className="relative text-center max-w-2xl mx-auto">
+              <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4 tracking-tight">
+                Not Sure Which Solar System You Need?
+              </h2>
+              <p className="text-white/80 text-lg mb-8 leading-relaxed">
+                Tell us what you want to power and we&apos;ll recommend the best
+                starting point from Winsay&apos;s available solar packages.
+              </p>
+              <Link
+                href="/solar-finder"
+                className={buttonVariants({ variant: "secondary", size: "lg", className: "shadow-lg" })}
+              >
+                <Search className="w-5 h-5" />
+                Find My Solar System
+              </Link>
+            </div>
+          </motion.div>
         </div>
       </section>
 

@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
-import { Users, Calendar, Settings, LogOut, Sun, LayoutDashboard } from "lucide-react";
+import { Users, Calendar, Settings, LogOut, Sun, LayoutDashboard, FileText, MessageSquare, Package } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { useAuth, signOut } from "@/lib/auth";
 import { cn } from "@/lib/utils";
@@ -11,6 +11,9 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { href: "/leads", label: "Leads", icon: Users },
   { href: "/schedule", label: "Schedule", icon: Calendar },
+  { href: "/cms", label: "CMS", icon: FileText },
+  { href: "/crm", label: "CRM", icon: MessageSquare },
+  { href: "/inventory", label: "Inventory", icon: Package },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 

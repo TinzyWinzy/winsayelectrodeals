@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 
 const navLinks = [
   { href: "/packages", label: "Packages" },
+  { href: "/solar-finder", label: "Find My System" },
   { href: "/#how-it-works", label: "How It Works" },
   { href: "/#about", label: "About" },
   { href: "/#installations", label: "Installations" },

@@ -1,3 +1,28 @@
+interface SolarFinderLeadRow {
+  id: string;
+  timestamp: string;
+  full_name: string;
+  whatsapp_number: string;
+  email: string;
+  city: string;
+  suburb: string;
+  appliances: string;
+  property_type: string | null;
+  backup_duration: string | null;
+  usage_pattern: string | null;
+  budget: string | null;
+  installation_timeline: string;
+  recommended_package_id: string;
+  recommended_package_name: string;
+  upgrade_package_id: string | null;
+  upgrade_package_name: string | null;
+  estimated_continuous_load: number;
+  estimated_surge_load: number;
+  expert_review_required: boolean;
+  lead_source: string;
+  status: string;
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -87,6 +112,11 @@ export interface Database {
         Insert: Omit<Database["public"]["Tables"]["install_schedules"]["Row"], "id" | "created_at">;
         Update: Partial<Database["public"]["Tables"]["install_schedules"]["Insert"]>;
       };
+    };
+    solar_finder_leads: {
+      Row: SolarFinderLeadRow;
+      Insert: Omit<SolarFinderLeadRow, "id" | "timestamp">;
+      Update: Partial<Omit<SolarFinderLeadRow, "id" | "timestamp">>;
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

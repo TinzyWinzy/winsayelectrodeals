@@ -44,4 +44,11 @@ const CardFooter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
 );
 CardFooter.displayName = "CardFooter";
 
-export { Card, CardHeader, CardContent, CardFooter };
+const CardTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadingElement>>(
+  ({ className, ...props }, ref) => (
+    <h3 ref={ref} className={cn("text-lg font-semibold text-primary", className)} {...props} />
+  )
+);
+CardTitle.displayName = "CardTitle";
+
+export { Card, CardHeader, CardContent, CardFooter, CardTitle };
